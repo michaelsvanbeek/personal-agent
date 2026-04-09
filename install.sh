@@ -4,11 +4,18 @@ set -euo pipefail
 # personal-agent installer
 # Symlinks skills, instructions, and tools into supported IDEs.
 # Run again any time you add or change content — it's idempotent.
+#
+# Usage:
+#   ./install.sh                                    # Install base framework
+#   ./install.sh /path/to/personal-agent-skills    # Install + external skills repo
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILLS_SRC="$SCRIPT_DIR/skills"
 INSTRUCTIONS_SRC="$SCRIPT_DIR/instructions"
 TOOLS_SRC="$SCRIPT_DIR/tools"
+
+# Optional: external skills repo (e.g., personal-agent-skills or org-specific repo)
+EXTERNAL_SKILLS_REPO="${1:-}"
 
 # ── Target directories ──────────────────────────────────────────────
 
@@ -90,8 +97,9 @@ echo ""
 echo -e "${CYAN}personal-agent installer${NC}"
 echo "========================"
 echo ""
-echo "Source: $SCRIPT_DIR"
-
+echo "Source: $SCRIPT_DIR"if [[ -n "$EXTERNAL_SKILLS_REPO" ]]; then
+    echo "External skills: $EXTERNAL_SKILLS_REPO"
+fi
 # ── Skills ──────────────────────────────────────────────────────────
 
 skill_count=0
@@ -106,7 +114,15 @@ for target_dir in "$COPILOT_SKILLS" "$CLAUDE_SKILLS" "$CURSOR_SKILLS"; do
             skill_count=$((skill_count + 1))
         fi
     done
-done
+    # External skills repo (optional)
+    if [[ -n "$EXTERNAL_SKILLS_REPO" && -d "$EXTERNAL_SKILLS_REPO/skills" ]]; then
+        for skill_dir in "$EXTERNAL_SKILLS_REPO"/skills/*/; do
+            if [[ -f "$skill_dir/SKILL.md" ]]; then
+                link_dir "$skill_dir" "$target_dir"
+                skill_count=$((skill_count + 1))
+            fi
+        done
+    fidone
 
 # ── Instructions (VS Code / Copilot) ───────────────────────────────
 

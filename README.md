@@ -1,17 +1,21 @@
 # Personal Agent
 
-A framework for building your own AI coding assistant — a collection of skills,
+A framework for building your own AI assistant — a collection of skills,
 tools, and MCP server connections that follow you across IDEs.
+
+This works for any role: software engineers, managers, analysts, writers,
+researchers, marketers — anyone who uses an AI assistant and wants it to know
+their conventions and connect to their systems.
 
 Clone this repo, add your own domain expertise, and run the installer to symlink
 everything into VS Code (Copilot), Cursor, or Claude Code.
 
 ## Why
 
-AI coding assistants are powerful out of the box, but they don't know *your*
+AI assistants are powerful out of the box, but they don't know *your*
 conventions. Every team has patterns, preferences, and hard-won lessons that get
-repeated in code reviews and Slack threads but never make it into the assistant's
-context.
+repeated in meetings, documents, and reviews but never make it into the
+assistant's context.
 
 Personal Agent fixes this. You encode your knowledge as **skills** (markdown
 files the agent loads on demand), wire up **MCP servers** for live data, and add
@@ -40,7 +44,7 @@ IDE paths so every conversation starts with your context already loaded.
 ## Quick Start
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/personal-agent.git
+git clone https://github.com/michaelsvanbeek/personal-agent.git
 cd personal-agent
 chmod +x install.sh
 ./install.sh
@@ -68,6 +72,30 @@ Then run `./install.sh` to distribute it. See the
 [Building Skills](docs/building-skills.md) guide and the
 [agent-skill](skills/agent-skill/SKILL.md) skill for best practices.
 
+## Community Skills
+
+Looking for more skills? The
+[personal-agent-skills](https://github.com/michaelsvanbeek/personal-agent-skills)
+repository is a community-maintained catalog of skills organized by persona. Browse
+skills tagged for your role — developer, manager, analyst, writer, and more — and
+install only what's relevant to your work.
+
+Want to share a skill you've built? Contribute it to the community repo. All
+contributed skills are audited for quality and duplication via pre-commit hooks.
+
+Building skills for your organization? See [Internal Org Skills Repositories](docs/design.md#internal-org-skills-repositories) for how to create a private, org-specific skills repo.
+
+## Context Management
+
+Your AI assistant has a finite context window. Every skill, instruction, and MCP
+server you add consumes space that could be used for the actual conversation.
+
+**Start small.** Install only what you need today. Add more when you notice the
+agent getting something wrong (add a skill) or when you need live data from a
+system you access often (add an MCP server).
+
+See the [Design Guide](docs/design.md) for the full context management philosophy.
+
 ## Adding MCP Servers
 
 MCP (Model Context Protocol) connects your agent to live data sources — calendars,
@@ -78,7 +106,8 @@ of available servers and setup instructions.
 
 - [Getting Started](docs/getting-started.md) — first-time setup walkthrough
 - [IDE Setup](docs/ide-setup.md) — per-IDE configuration instructions
-- [Design Guide](docs/design.md) — architecture and philosophy
+- [Design Guide](docs/design.md) — architecture, philosophy, and productionization roadmap
+- [Context Management](docs/context-management.md) — what gets loaded, when, and how to route content
 - [Building Skills](docs/building-skills.md) — how to write effective skills
 - [Building Tools](docs/building-tools.md) — adding CLI tools and scripts
 - [MCP Servers](docs/mcp-servers.md) — connecting to external services
@@ -114,11 +143,20 @@ personal-agent/
 
 ## Contributing
 
-Contributions are welcome. Please open an issue or pull request.
+Contributions to the **framework** (installer, documentation, foundational skills)
+are welcome here. Please open an issue or pull request.
 
-When contributing skills, follow the conventions in the
+**Domain skills** (specific to a role, technology, or workflow) should be
+contributed to
+[personal-agent-skills](https://github.com/michaelsvanbeek/personal-agent-skills)
+instead. This keeps the core framework lean and the skill catalog discoverable.
+
+When contributing skills to either repo, follow the conventions in the
 [agent-skill](skills/agent-skill/SKILL.md) skill and ensure your SKILL.md passes
 the quality checklist in [Building Skills](docs/building-skills.md).
+
+**Building for your organization?** Create an internal skills repo following the same
+pattern. See [Internal Org Skills Repositories](docs/design.md#internal-org-skills-repositories).
 
 ## License
 
