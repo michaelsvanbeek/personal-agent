@@ -1,0 +1,9 @@
+{
+  "editor.rulers": [100],
+  "editor.tabSize": 2,
+  "editor.formatOnSave": true,
+  "editor.bracketPairColorization.enabled": true,
+  "editor.stickyScroll.enabled": true,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true
+}
