@@ -58,6 +58,27 @@ The installer will:
 
 Run `./install.sh` again any time you add or change skills — it's idempotent.
 
+## Follow External Skill Repositories
+
+Use `personal-agent` as your runtime, and follow external skill repos via symlinks.
+This keeps your skills auto-updated from source repos while preserving a clean local setup.
+
+```bash
+# Link community skills
+link-skills-repo add ~/code/personal-agent-skills community
+
+# Link organization-specific skills
+link-skills-repo add ~/code/my-org-agent-skills org
+
+# Link personal/private skills
+link-skills-repo add ~/code/my-personal-skills personal
+
+# Sync all linked skills into your IDE directories
+./install.sh
+```
+
+See [Following External Skills Repositories](docs/following-skills-repos.md) for the full workflow.
+
 ## Adding Your Own Skills
 
 Create a new directory under `skills/` with a `SKILL.md` file:
@@ -108,6 +129,7 @@ of available servers and setup instructions.
 - [IDE Setup](docs/ide-setup.md) — per-IDE configuration instructions
 - [Design Guide](docs/design.md) — architecture, philosophy, and productionization roadmap
 - [Context Management](docs/context-management.md) — what gets loaded, when, and how to route content
+- [Following External Skills Repositories](docs/following-skills-repos.md) — symlink strategy for community, org, and personal skill repos
 - [Building Skills](docs/building-skills.md) — how to write effective skills
 - [Building Tools](docs/building-tools.md) — adding CLI tools and scripts
 - [MCP Servers](docs/mcp-servers.md) — connecting to external services

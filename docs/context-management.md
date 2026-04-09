@@ -193,6 +193,27 @@ When you describe a task, the IDE searches your skills' "Use when:" descriptions
 
 The skill stays loaded for the conversation. You don't reload it per message.
 
+### 4. Following External Skill Repositories
+
+When you want to keep skills sourced from other repos, link them into
+`skills/linked/` and keep that directory gitignored. This lets you use:
+
+- community skills from `personal-agent-skills`
+- org-private skills from an internal repo
+- personal/private skills from your own repo
+
+Use the helper tool:
+
+```bash
+link-skills-repo add ~/code/personal-agent-skills community
+link-skills-repo add ~/code/my-org-agent-skills org
+link-skills-repo add ~/code/my-personal-skills personal
+./install.sh
+```
+
+This keeps `personal-agent` as the runtime while external repos remain the source of truth.
+See [Following External Skills Repositories](following-skills-repos.md) for the full model.
+
 ---
 
 ## Context Budget: How Much is Too Much?
@@ -268,5 +289,6 @@ When adding new content:
 - **To understand the design philosophy**: Read [Design Philosophy](design.md)
 - **To see example personas and what they need**: Read [Design Philosophy - Example Personas](design.md#example-personas)
 - **To add a new skill**: See [Building Skills](building-skills.md) and [agent-skill SKILL.md](../skills/agent-skill/SKILL.md)
-- **To add a new instruction**: See [Building Instructions](building-tools.md#instructions)
+- **To follow external skills repos**: See [Following External Skills Repositories](following-skills-repos.md)
+- **To add tools and automations**: See [Building Tools](building-tools.md)
 - **To create an org-specific skills repository**: See [personal-agent-skills: Internal Skills Repositories](https://github.com/michaelsvanbeek/personal-agent-skills/blob/main/docs/internal-org-skills.md)

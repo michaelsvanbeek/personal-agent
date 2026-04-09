@@ -11,11 +11,11 @@ A step-by-step guide to setting up your personal agent from scratch.
 ## Step 1: Clone the Repo
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/personal-agent.git
+git clone https://github.com/michaelsvanbeek/personal-agent.git
 cd personal-agent
 ```
 
-> Replace `YOUR_USERNAME` with your GitHub handle after forking.
+> Fork first if you want your own version, then clone your fork URL.
 
 ## Step 2: Run the Installer
 
@@ -107,6 +107,24 @@ Review this code for issues — use the code-review skill.
 MCP servers give your agent live access to external systems. See the
 [MCP Servers](mcp-servers.md) guide for setup instructions and a directory of
 available servers.
+
+## Step 6: Follow External Skill Repositories (Optional)
+
+If you want skills to update from source repos (community, org, personal), link
+them into `skills/linked/`:
+
+```bash
+# Community skills
+link-skills-repo add ~/code/personal-agent-skills community
+
+# Org/private skills
+link-skills-repo add ~/code/my-org-agent-skills org
+
+# Sync links into IDE skill directories
+./install.sh
+```
+
+See [Following External Skills Repositories](following-skills-repos.md) for full details.
 
 ## Next Steps
 

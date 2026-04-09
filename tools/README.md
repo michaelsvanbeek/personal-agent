@@ -11,3 +11,7 @@ examples.
 2. Add a shebang: `#!/usr/bin/env bash` or `#!/usr/bin/env python3`
 3. Make it executable: `chmod +x tools/my-tool`
 4. Run `./install.sh` to symlink it to your PATH
+
+## Included tools
+
+- `link-skills-repo` - Link external skill repos into `skills/linked/` so updates flow through `personal-agent`

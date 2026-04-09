@@ -1,0 +1,194 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# link-skills-repo - manage linked external skill repositories
+#
+# This tool creates symlinks in skills/linked/ so personal-agent can follow
+# updates from external repos (community, org, or personal).
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+LINK_ROOT="$REPO_ROOT/skills/linked"
+
+usage() {
+    cat <<'EOF'
+Usage:
+  link-skills-repo add <repo-path> [alias]
+  link-skills-repo remove <alias>
+  link-skills-repo list
+
+Commands:
+  add      Link all skills from <repo-path>/skills into skills/linked/
+           Link names are created as: <alias>--<skill-name>
+           If alias is omitted, the repository directory name is used.
+
+  remove   Remove all linked skills for the alias
+
+  list     Show all linked skills and their source paths
+
+Examples:
+  link-skills-repo add ~/code/personal-agent-skills
+  link-skills-repo add ~/code/my-org-agent-skills org
+  link-skills-repo remove personal-agent-skills
+  link-skills-repo list
+EOF
+}
+
+log() {
+    echo "$1"
+}
+
+fail() {
+    echo "Error: $1" >&2
+    exit 1
+}
+
+ensure_link_root() {
+    mkdir -p "$LINK_ROOT"
+}
+
+validate_alias() {
+    local alias="$1"
+    if [[ ! "$alias" =~ ^[a-zA-Z0-9._-]+$ ]]; then
+        fail "Alias '$alias' contains invalid characters"
+    fi
+}
+
+add_repo() {
+    local repo_input="$1"
+    local alias_input="${2:-}"
+    local repo
+    repo="$(cd "$repo_input" 2>/dev/null && pwd)" || fail "Repository path not found: $repo_input"
+
+    local skills_dir="$repo/skills"
+    [[ -d "$skills_dir" ]] || fail "No skills directory found at: $skills_dir"
+
+    local alias
+    alias="${alias_input:-$(basename "$repo")}"
+    validate_alias "$alias"
+
+    ensure_link_root
+
+    local linked_count=0
+    local skipped_count=0
+
+    while IFS= read -r skill_dir; do
+        if [[ ! -f "$skill_dir/SKILL.md" ]]; then
+            continue
+        fi
+
+        local skill_name
+        skill_name="$(basename "$skill_dir")"
+        local link_name="${alias}--${skill_name}"
+        local link_path="$LINK_ROOT/$link_name"
+
+        if [[ -e "$link_path" && ! -L "$link_path" ]]; then
+            fail "Path already exists and is not a symlink: $link_path"
+        fi
+
+        if [[ -L "$link_path" ]]; then
+            local current
+            current="$(readlink "$link_path")"
+            if [[ "$current" == "$skill_dir" ]]; then
+                log "~ $link_name (already linked)"
+                skipped_count=$((skipped_count + 1))
+                continue
+            fi
+        fi
+
+        ln -sfn "$skill_dir" "$link_path"
+        log "✓ $link_name"
+        linked_count=$((linked_count + 1))
+    done < <(find -L "$skills_dir" -mindepth 1 -maxdepth 1 -type d | sort)
+
+    if [[ $linked_count -eq 0 && $skipped_count -eq 0 ]]; then
+        fail "No skill directories with SKILL.md found in $skills_dir"
+    fi
+
+    # Remove any links that do not point to skill directories anymore.
+    while IFS= read -r link_path; do
+        [[ -L "$link_path" ]] || continue
+        local target
+        target="$(readlink "$link_path")"
+        if [[ ! -f "$target/SKILL.md" ]]; then
+            rm -f "$link_path"
+            log "- removed stale link $(basename "$link_path")"
+        fi
+    done < <(find "$LINK_ROOT" -mindepth 1 -maxdepth 1 -name "${alias}--*" | sort)
+
+    echo
+    log "Linked skills from '$repo' as alias '$alias'."
+    log "Run ./install.sh to sync them into your IDE skill directories."
+}
+
+remove_repo() {
+    local alias="$1"
+    validate_alias "$alias"
+
+    [[ -d "$LINK_ROOT" ]] || fail "No linked skills directory found"
+
+    local found=0
+    while IFS= read -r link_path; do
+        [[ -e "$link_path" ]] || continue
+        rm -f "$link_path"
+        log "- removed $(basename "$link_path")"
+        found=1
+    done < <(find "$LINK_ROOT" -mindepth 1 -maxdepth 1 -name "${alias}--*" | sort)
+
+    if [[ $found -eq 0 ]]; then
+        fail "No linked skills found for alias: $alias"
+    fi
+
+    echo
+    log "Removed linked skills for alias '$alias'."
+    log "Run ./install.sh to refresh IDE skill symlinks if needed."
+}
+
+list_links() {
+    if [[ ! -d "$LINK_ROOT" ]]; then
+        log "No linked skills directory found"
+        return
+    fi
+
+    local count=0
+    while IFS= read -r link_path; do
+        [[ -L "$link_path" ]] || continue
+        local name
+        local target
+        name="$(basename "$link_path")"
+        target="$(readlink "$link_path")"
+        printf '%s -> %s\n' "$name" "$target"
+        count=$((count + 1))
+    done < <(find "$LINK_ROOT" -mindepth 1 -maxdepth 1 -type l | sort)
+
+    if [[ $count -eq 0 ]]; then
+        log "No linked skills found"
+    fi
+}
+
+main() {
+    local command="${1:-}"
+
+    case "$command" in
+        add)
+            [[ $# -ge 2 ]] || { usage; exit 1; }
+            add_repo "$2" "${3:-}"
+            ;;
+        remove)
+            [[ $# -eq 2 ]] || { usage; exit 1; }
+            remove_repo "$2"
+            ;;
+        list)
+            [[ $# -eq 1 ]] || { usage; exit 1; }
+            list_links
+            ;;
+        -h|--help|help|"")
+            usage
+            ;;
+        *)
+            fail "Unknown command: $command"
+            ;;
+    esac
+}
+
+main "$@"

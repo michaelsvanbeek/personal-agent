@@ -11,6 +11,7 @@ Documentation for Personal Agent framework—architecture, philosophy, guides, a
 
 - [Design Guide](design.md) — architecture, philosophy, design principles, and productionization roadmap
 - [Context Management](context-management.md) — what gets loaded into your agent's context, when, and how to route content between skills/instructions/MCPs/tools
+- [Following External Skills Repositories](following-skills-repos.md) — symlink-based workflow for community, org, and personal skill repos
 - [Building Skills](building-skills.md) — how to write effective skills with best practices
 - [Building Tools](building-tools.md) — adding CLI tools and automation scripts
 - [MCP Servers](mcp-servers.md) — connecting to external services and data sources

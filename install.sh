@@ -97,10 +97,22 @@ echo ""
 echo -e "${CYAN}personal-agent installer${NC}"
 echo "========================"
 echo ""
-echo "Source: $SCRIPT_DIR"if [[ -n "$EXTERNAL_SKILLS_REPO" ]]; then
+echo "Source: $SCRIPT_DIR"
+if [[ -n "$EXTERNAL_SKILLS_REPO" ]]; then
     echo "External skills: $EXTERNAL_SKILLS_REPO"
 fi
+
 # ── Skills ──────────────────────────────────────────────────────────
+
+collect_skill_dirs() {
+    local root="$1"
+    if [[ ! -d "$root" ]]; then
+        return
+    fi
+
+    # Include top-level skills and one nested level (e.g., skills/linked/*).
+    find -L "$root" -mindepth 1 -maxdepth 2 -type d | sort
+}
 
 skill_count=0
 for target_dir in "$COPILOT_SKILLS" "$CLAUDE_SKILLS" "$CURSOR_SKILLS"; do
@@ -108,21 +120,23 @@ for target_dir in "$COPILOT_SKILLS" "$CLAUDE_SKILLS" "$CURSOR_SKILLS"; do
     echo -e "Skills → ${CYAN}$target_dir${NC}"
     mkdir -p "$target_dir"
 
-    for skill_dir in "$SKILLS_SRC"/*/; do
+    while IFS= read -r skill_dir; do
         if [[ -f "$skill_dir/SKILL.md" ]]; then
             link_dir "$skill_dir" "$target_dir"
             skill_count=$((skill_count + 1))
         fi
-    done
+    done < <(collect_skill_dirs "$SKILLS_SRC")
+
     # External skills repo (optional)
     if [[ -n "$EXTERNAL_SKILLS_REPO" && -d "$EXTERNAL_SKILLS_REPO/skills" ]]; then
-        for skill_dir in "$EXTERNAL_SKILLS_REPO"/skills/*/; do
+        while IFS= read -r skill_dir; do
             if [[ -f "$skill_dir/SKILL.md" ]]; then
                 link_dir "$skill_dir" "$target_dir"
                 skill_count=$((skill_count + 1))
             fi
-        done
-    fidone
+        done < <(collect_skill_dirs "$EXTERNAL_SKILLS_REPO/skills")
+    fi
+done
 
 # ── Instructions (VS Code / Copilot) ───────────────────────────────
 

@@ -571,3 +571,6 @@ Team members run:
 ```
 
 This merges all skills into their IDE context.
+
+For a symlink-first workflow that keeps external repos as source of truth, see
+[Following External Skills Repositories](following-skills-repos.md).

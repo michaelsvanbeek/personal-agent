@@ -1,0 +1,4 @@
+# Keep this directory tracked, but ignore user-linked skills.
+*
+!.gitignore
+!.gitkeep

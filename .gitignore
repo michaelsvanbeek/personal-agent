@@ -12,3 +12,8 @@ Thumbs.db
 # Environment
 .env
 .env.local
+
+# User-linked external skills (managed via tools/link-skills-repo)
+skills/linked/*
+!skills/linked/.gitignore
+!skills/linked/.gitkeep
